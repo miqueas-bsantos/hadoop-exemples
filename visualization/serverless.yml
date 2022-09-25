@@ -1,0 +1,57 @@
+service: senac-score-movies
+# org: miqueassantos
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
+  pythonRequirements:
+    dockerizePip: "non-linux"
+    # slim: true
+  alerts:
+    stages:
+      - dev
+
+provider:
+  profile: miqueas-santos
+  name: aws
+  runtime: python3.8
+  stage: dev
+  stackTags:
+    Owner: Miqueas Santos
+  region: us-east-1
+  logRetentionInDays: 1
+  logs:
+    restApi: true
+  tracing:
+    apiGateway: true
+    lambda: false
+  environment:
+    LOG_LEVEL: INFO # Log level global para ser usado pelo logger aws-lambda-powertools
+    HOST: ""
+    DATABASE: ""
+    USER: ""
+    PASSWORD: ""
+    REGION: 'us-east-1'
+    COGNITO_USER_POOL_ID: ''
+    COGNITO_CLIENT_ID: ''
+
+functions:
+  scores: ${file(functions/scores.yml)}
+
+package:
+  individually: true
+  exclude:
+    - test/**
+    - node_modules/**
+    - buildspec.yml
+    - functions/**
+    - README.md/
+    - env/**
+    - venv/**
+    - startbootstrap-sb-admin-2-master/**
+
+plugins:
+  - serverless-iam-roles-per-function # Plugin de criacao de role e policy para cada lambda
+  - serverless-plugin-aws-alerts # Plugin de criacao de alarmes para as metricas do Lambda
+  - serverless-pseudo-parameters # Plugin para uso da funcao !Sub do Cloudformation
+  - serverless-python-requirements # Plugin para controle dos modulos python no requirements.txt

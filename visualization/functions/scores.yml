@@ -1,0 +1,36 @@
+handler: handler.handler
+module: src
+memorySize: 256
+timeout: 30
+description: Proxy API
+events:
+  - http: 
+      path: /{proxy+}
+      method: any
+      cors: true
+# alarms:
+#   - functionDuration
+#   - name: functionDuration
+#     threshold: 3000
+#     description: ${self:service}-${self:custom.stage}-api-reports-acquirer Lambda Timeout - WARNING
+#   - functionErrors
+#   - name: functionErrors
+#     description: ${self:service}-${self:custom.stage}-api-reports-acquirer Lambda Error - ERROR
+#   - functionThrottles
+#   - name: functionThrottles
+#     description: ${self:service}-${self:custom.stage}-api-reports-acquirer Lambda Throttle - ERROR
+iamRoleStatementsName: ${self:custom.region}-#{AWS::AccountId}-${self:service}-fastapi
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - s3:*
+      # - xray:PutTelemetryRecords
+    Resource:
+      - "*"
+# vpc:
+#   securityGroupIds:
+#     - ${ssm:/${self:custom.stage}/vpc/us-east-1-security-group}
+#   subnetIds:
+#     - ${ssm:/${self:custom.stage}/vpc/subnet/private/us-east-1a}
+#     - ${ssm:/${self:custom.stage}/vpc/subnet/private/us-east-1b}
+#     - ${ssm:/${self:custom.stage}/vpc/subnet/private/us-east-1c}
